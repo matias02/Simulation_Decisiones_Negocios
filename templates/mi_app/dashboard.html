@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        /* Estilos para organizar los gráficos */
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: flex-start;
+        }
+        .chart-box {
+            width: 48%; /* Aproximadamente la mitad del contenedor para tener 2 gráficos por fila */
+            margin-bottom: 20px; /* Espacio entre las filas de gráficos */
+        }
+        canvas {
+            width: 100% !important;
+            max-width: 400px; /* O el tamaño máximo que prefieras para los gráficos */
+            height: auto !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <div class="chart-container">
+        <!-- Gráfico de Market Share -->
+        <div class="chart-box">
+            <canvas id="marketShareChart"></canvas>
+        </div>
+        
+        <!-- Gráfico de Profitability -->
+        <div class="chart-box">
+            <canvas id="profitabilityChart"></canvas>
+        </div>
+
+        <!-- Gráfico de Revenue -->
+        <div class="chart-box">
+            <canvas id="revenueChart"></canvas>
+        </div>
+
+        <!-- Gráfico de Demand by Region -->
+        <div class="chart-box">
+            <canvas id="demandByRegionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Incluir Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Suponiendo que tienes una variable de contexto `data` que contiene los datos del JSON
+        const data = {{ data|safe }};
+        
+        // Ejemplo de cómo podrías configurar un gráfico de pastel para el Market Share
+        const marketShareCtx = document.getElementById('marketShareChart').getContext('2d');
+        new Chart(marketShareCtx, {
+            type: 'pie',
+            data: {
+                labels: data.market_share.map(item => `Year ${item.year}`),
+                datasets: [{
+                    data: data.market_share.map(item => item.value),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56'
+                    ],
+                    hoverBackgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56'
+                    ]
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Market Share',
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        },
+                        font: {
+                            size: 20
+                        }
+                    }
+                },
+                // ... otras opciones ...
+            }
+        });
+
+        // Configuración para el gráfico de Profitability
+        const profitabilityCtx = document.getElementById('profitabilityChart').getContext('2d');
+        new Chart(profitabilityCtx, {
+            type: 'line', // Tipo de gráfico de línea para mostrar la rentabilidad a lo largo del tiempo
+            data: {
+                labels: data.profitability.map(item => `Year ${item.year}`),
+                datasets: [{
+                    label: 'Profitability',
+                    data: data.profitability.map(item => item.value),
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    fill: false,
+                    borderWidth: 2,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Profitability',
+                            padding: {
+                                top: 10,
+                                bottom: 30
+                            },
+                            font: {
+                                size: 20
+                            }
+                        }
+                    },
+                    scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+                }
+            });
+
+        // Configuración para el gráfico de Revenue
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'bar', // Tipo de gráfico de barras para mostrar los ingresos
+            data: {
+                labels: data.revenue.map(item => `Year ${item.year}`),
+                datasets: [{
+                    label: 'Revenue',
+                    data: data.revenue.map(item => item.value),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Revenue',
+                            padding: {
+                                top: 10,
+                                bottom: 30
+                            },
+                            font: {
+                                size: 20
+                            }
+                        }
+                    },
+                    scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+                }
+            });
+
+        // Configuración para el gráfico de Demand by Region
+        const demandByRegionCtx = document.getElementById('demandByRegionChart').getContext('2d');
+        new Chart(demandByRegionCtx, {
+            type: 'polarArea', // Tipo de gráfico de área polar para mostrar la demanda por región
+            data: {
+                labels: Object.keys(data.demand_by_region),
+                datasets: [{
+                    label: 'Demand by Region',
+                    data: Object.values(data.demand_by_region),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+        options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Demand by Region',
+                            padding: {
+                                top: 10,
+                                bottom: 30
+                            },
+                            font: {
+                                size: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: false
+                            },
+                            suggestedMin: 0
+                        }
+                }
+                }
+            });
+    </script>
+</body>
+</html>
