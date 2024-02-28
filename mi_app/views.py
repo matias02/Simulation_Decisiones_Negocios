@@ -1,12 +1,14 @@
-# views.py de mi_app
-
 from django.shortcuts import render
-import json
+from django.conf import settings
+import subprocess
+import os
 
 def dashboard_view(request):
-    # Asegúrate de que la ruta al archivo JSON sea correcta
-    with open('dashboard_data.json', 'r') as file:
-        data = json.load(file)
+    # Construye la ruta completa al script
+    script_path = os.path.join(settings.BASE_DIR, 'mi_app', 'generate_charts.py')
     
-    # Renderizar la plantilla, notar que se utiliza 'mi_app/dashboard.html'
-    return render(request, 'mi_app/dashboard.html', {'data': data})
+    # Ejecuta el script para generar los gráficos
+    subprocess.run(['python', script_path], check=True)
+    
+    # Renderiza la plantilla normalmente
+    return render(request, 'mi_app/dashboard.html')
